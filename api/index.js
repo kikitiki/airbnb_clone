@@ -1,34 +1,53 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const User = require("./models/User.js");
 const bodyParser = require("body-parser");
 
-// app.use(process);
-app.use(bodyParser.json());
-app.use(express.json());
+require("dotenv").config();
+const app = express();
 
-app.use(
-  cors()
-  //   cors({
-  //     credentials: true,
-  //     origin: "http://127.0.0.1:5173",
-  //   })
-);
+const bcryptSalt = bcrypt.genSaltSync(10);
+
+app.use(bodyParser.json());
+//app.use(express.json());
+
+app.use(cors());
+mongoose.set("strictQuery", false);
+mongoose.connect(process.env.MONGO_URL, () => {
+  console.log("Connected to MongoDB");
+});
+// console.log(process.env.MONGO_URL);
+// mongoose.connect(process.env.MONGO_URL);
 
 app.get("/test", (req, res) => {
   res.json("test ok");
 });
 
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
-
-  res.json(name, email, password);
+  try {
+    const userDoc = await User.create({
+      name,
+      email,
+      password: bcrypt.hashSync(password, bcryptSalt),
+    });
+    res.json(userDoc);
+  } catch (e) {
+    res.status(422).json(e);
+  }
 });
 
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const userDoc = await User.findOne({ email });
+  if (userDoc) {
+    res.json("found");
+  } else {
+    res.json("not found");
+  }
+});
+
+//majmunenagrani2018
 app.listen(3000);
-
-// app.listen(3000,()=>{
-//     console.log("Server listening on port 3000");
-// });
-
-//console.log(process);

@@ -17,7 +17,8 @@ export default function RegisterPage() {
         email,
         password,
       });
-      navigate("/home");
+      alert("Registration successful.Now you can login");
+      //navigate("/home");
     } catch (e) {
       alert("Registration failed. Please try again later");
     }
@@ -52,8 +53,7 @@ export default function RegisterPage() {
           <div className="text-center py-2 text-gray-500">
             Allready a member?
             <Link className="underline text-black" to={"/login"}>
-              {" "}
-              Login{" "}
+              Login
             </Link>
           </div>
         </form>
